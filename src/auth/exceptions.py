@@ -1,12 +1,21 @@
-from fastapi import Request
-from fastapi.responses import JSONResponse
-
-from src.main import app
+from fastapi import status
+from src.exceptions import AppException
 
 
-# @app.exception_handler(AuthJWTException)
-# def authjwt_exception_handler(request: Request, exc: AuthJWTException):
-#     return JSONResponse(
-#         status_code=exc.status_code,
-#         content={"detail": exc.message}
-#     )
+class TokenExpiredException(AppException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = "Срок действия токена истек"
+
+
+class TokenAbsentException(AppException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = "Токен отсутствует"
+
+
+class IncorrectTokenFormatException(AppException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = "Неверный формат токена"
+
+
+class UserIsNotPresentException(AppException):
+    status_code = status.HTTP_401_UNAUTHORIZED

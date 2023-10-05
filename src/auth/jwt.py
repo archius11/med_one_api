@@ -1,9 +1,11 @@
 from typing import Annotated
-from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi import APIRouter, HTTPException, Depends, Request, Response
 
 from src.auth.models import User
 
-from src.auth.dependencies import login_user_data, auth_code_confirm_login
+from src.auth.dependencies import login_user_data, auth_code_confirm_login, get_current_user
+
+from src.auth.utils import create_access_token, create_refresh_token
 
 
 jwt_auth_router = APIRouter()
@@ -34,9 +36,28 @@ async def login_user(
 
 @jwt_auth_router.post('/sms_confirmation', summary="Auth code")
 async def sms_confirmation(
+        response: Response,
         user_verification: Annotated[dict, Depends(auth_code_confirm_login)]
 ):
     if not user_verification['confirmation_code'] == user_verification['sent_code']:
         raise HTTPException(status_code=400, detail="Invalid code.")
 
-    return user_verification
+    access_token = create_access_token(user_verification['current_user'].id)
+    response.set_cookie("access_token", access_token, httponly=True)
+
+    refresh_token = create_refresh_token(user_verification['current_user'].id)
+    response.set_cookie("refresh_token", refresh_token, httponly=True)
+
+    return {"access_token": access_token, "refresh_token": refresh_token}
+
+
+@jwt_auth_router.get('/refresh', summary="Refresh access token")
+async def refresh(
+        response: Response,
+        user=Depends(get_current_user)
+):
+    access_token = create_access_token(user.id)
+    response.set_cookie("access_token", access_token, httponly=True)
+
+    return {"access_token": access_token}
+
