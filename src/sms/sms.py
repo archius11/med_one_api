@@ -7,25 +7,27 @@ from src.auth.exceptions import SMSOperationException
 
 
 class SMS_Sender:
-    def __init__(self):
-        self.host = settings.SMS_SERVICE_HOST
-        self.sign =settings.SMS_SENDER
+    host = settings.SMS_SERVICE_HOST
+    sign = settings.SMS_SENDER
 
-    def test(self):
-        return self._request('auth').ok
+    @classmethod
+    def test(cls):
+        return cls._request('auth').ok
 
-    def send_sms(self, phone_number, text):
+    @classmethod
+    def send_sms(cls, phone_number, text):
         if settings.MODE == 'DEV':
             path = 'sms/testsend'
         else:
             path = 'sms/send'
         print(f'sent sms: {text}')
-        return self._request(path, sign=self.sign, number=phone_number, text=text).ok
+        return cls._request(path, sign=cls.sign, number=phone_number, text=text).ok
 
-    def _request(self, path, **params):
+    @classmethod
+    def _request(cls, path, **params):
         request = requests.session()
         response = request.get(
-            os.path.join(self.host, path),
+            os.path.join(cls.host, path),
             auth=(settings.SMS_ACCOUNT_EMAIL, settings.SMS_SERVICE_API_KEY),
             params=params)
 
