@@ -1,0 +1,30 @@
+services:
+  web:
+    build: .
+    ports:
+      - "4567:4567"
+    volumes:
+      - .:/code
+    depends_on:
+      - redis
+      - dbpostgres
+    env_file:
+      - .env
+    container_name: med_one_api
+  redis:
+    build:
+      dockerfile: redis.Dockerfile
+    ports:
+      - "6379:6379"
+    container_name: med_one_api_redis
+  dbpostgres:
+    image: postgres:16-alpine
+    volumes:
+      - ${DATABASES_PATH}:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    container_name: med_one_api_dbpostgres

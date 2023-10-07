@@ -2,6 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends, Request, Response
 
 from src.auth.models import User
+from src.auth.dao import UserDAO
 
 from src.auth.dependencies import login_user_data, auth_code_confirm_login, get_current_user
 
@@ -49,3 +50,9 @@ async def refresh(
     response.set_cookie("access_token", access_token, httponly=True)
 
     return {"access_token": access_token}
+
+
+@jwt_auth_router.get('/get_users', summary="get all users (debug)")
+async def get_users():
+    users = await UserDAO.get_by_filter()
+    return {"users": users}
