@@ -31,6 +31,8 @@ async def sms_confirmation(
     if not code_is_right:
         raise HTTPException(status_code=400, detail="Invalid code.")
 
+    await UserDAO.set_user_verified(user_verification['current_user'])
+
     access_token = create_access_token(user_verification['current_user'].id)
     response.set_cookie("access_token", access_token, httponly=True)
 

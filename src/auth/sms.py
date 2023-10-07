@@ -16,7 +16,7 @@ class SMS_Verification:
         cls._check_last_sent_timeout(user)
         code = cls._generate_new_code()
         text = cls._get_message_text(code)
-        if SMS_Sender.send_sms(user.phone_number, text):
+        if await SMS_Sender.send_sms(user.phone_number, text):
             await RedisClient.set_key(f'sms_code_{user.phone_number}', code)
 
     @classmethod
