@@ -39,6 +39,8 @@ async def sms_confirmation(
     refresh_token = create_refresh_token(user_verification['current_user'].id)
     response.set_cookie("refresh_token", refresh_token, httponly=True)
 
+    await SMS_Verification.delete_code(user_verification['current_user'])
+
     return {"access_token": access_token, "refresh_token": refresh_token}
 
 
