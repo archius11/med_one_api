@@ -11,12 +11,16 @@ services:
     env_file:
       - .env
     container_name: med_one_api
+    network_mode: host
+
   redis:
     build:
       dockerfile: redis.Dockerfile
     ports:
       - "6379:6379"
     container_name: med_one_api_redis
+    network_mode: host
+
   dbpostgres:
     image: postgres:16-alpine
     volumes:
@@ -28,3 +32,4 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     container_name: med_one_api_dbpostgres
+    network_mode: host

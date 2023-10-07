@@ -1,4 +1,4 @@
-import requests
+import aiohttp
 import os
 
 from src.settings import settings
@@ -11,27 +11,37 @@ class SMS_Sender:
     sign = settings.SMS_SENDER
 
     @classmethod
-    def test(cls):
-        return cls._request('auth').ok
+    async def test(cls):
+        response = await cls._request('auth')
+        return response['status_is_ok']
 
     @classmethod
-    def send_sms(cls, phone_number, text):
+    async def send_sms(cls, phone_number, text):
         if settings.MODE == 'DEV':
             path = 'sms/testsend'
         else:
             path = 'sms/send'
         print(f'sent sms: {text}')
-        return cls._request(path, sign=cls.sign, number=phone_number, text=text).ok
+        response = await cls._request(path, sign=cls.sign, number=phone_number, text=text)
+        return response['status_is_ok']
 
     @classmethod
-    def _request(cls, path, **params):
-        request = requests.session()
-        response = request.get(
-            os.path.join(cls.host, path),
-            auth=(settings.SMS_ACCOUNT_EMAIL, settings.SMS_SERVICE_API_KEY),
-            params=params)
+    async def _request(cls, path, **params):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                    os.path.join(cls.host, path),
+                    auth=aiohttp.BasicAuth(settings.SMS_ACCOUNT_EMAIL, settings.SMS_SERVICE_API_KEY),
+                    params=params
+            ) as response:
+                response_data = await response.json()
+                response_status = response.status
+                response_status_is_ok = response.ok
 
-        if not response.ok:
-            raise SMSOperationException(f'{SMSOperationException.detail} : "{path}" : {response.json()["message"]}')
+        if not response_status_is_ok:
+            raise SMSOperationException(f'{SMSOperationException.detail} : "{path}" : {response_data["message"]}')
 
-        return response
+        return {
+            'data': response_data,
+            'status': response_status,
+            'status_is_ok': response_status_is_ok,
+        }
