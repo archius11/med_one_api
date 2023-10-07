@@ -10,6 +10,8 @@ from src.auth.utils import create_access_token, create_refresh_token
 
 from src.auth.sms import SMS_Verification
 
+from src.redis.connect import RedisClient
+
 jwt_auth_router = APIRouter()
 
 
@@ -54,5 +56,9 @@ async def refresh(
 
 @jwt_auth_router.get('/get_users', summary="get all users (debug)")
 async def get_users():
-    users = await UserDAO.get_by_filter()
-    return {"users": users}
+    RedisClient.ping()
+
+    RedisClient.set_key('mykey', 'Hello from Python!')
+    value = RedisClient.get_key('mykey')
+
+    return value
