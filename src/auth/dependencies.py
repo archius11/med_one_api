@@ -12,6 +12,8 @@ from src.auth.exceptions import TokenAbsentException, TokenExpiredException, \
 
 from src.settings import settings
 
+from src.auth.utils import normalize_phone_number
+
 
 async def get_or_create_user_by_phone(phone_number):
     current_user = await UserDAO.get_or_none(phone_number=phone_number)
@@ -22,7 +24,8 @@ async def get_or_create_user_by_phone(phone_number):
 
 
 async def login_user_data(request: Request, user_data: LoginUserSchema):
-    current_user = await get_or_create_user_by_phone(user_data.phone_number)
+    phone_number = normalize_phone_number(user_data.phone_number)
+    current_user = await get_or_create_user_by_phone(phone_number)
     return current_user
 
 
@@ -31,8 +34,9 @@ def get_sent_code(phone_number: str) -> Optional[str]:
 
 
 async def auth_code_confirm_login(user_verification: ConfirmCodeSchema):
+    phone_number = normalize_phone_number(user_verification.phone_number)
     return {
-        'current_user': await get_or_create_user_by_phone(user_verification.phone_number),
+        'current_user': await get_or_create_user_by_phone(phone_number),
         'confirmation_code': user_verification.confirmation_code
     }
 

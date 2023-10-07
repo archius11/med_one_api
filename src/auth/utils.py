@@ -30,3 +30,7 @@ def create_access_token(subject: Union[str, Any]) -> str:
 
 def create_refresh_token(subject: Union[str, Any]) -> str:
     return create_token(subject, settings.REFRESH_TOKEN_EXPIRE_MINUTES)
+
+
+def normalize_phone_number(phone_number):
+    return '7' + ''.join(list(filter(lambda x: x.isdigit(), phone_number))[-10:])

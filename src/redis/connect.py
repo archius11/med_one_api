@@ -8,13 +8,13 @@ class RedisClient:
     REDIS_CLIENT = redis.Redis(connection_pool=REDIS_POOL)
 
     @classmethod
-    def ping(cls):
-        cls.REDIS_CLIENT.ping()
+    async def ping(cls):
+        await cls.REDIS_CLIENT.ping()
 
     @classmethod
-    def set_key(cls, key, value):
-        cls.REDIS_CLIENT.set(key, value)
+    async def set_key(cls, key, value):
+        await cls.REDIS_CLIENT.set(key, value)
 
     @classmethod
-    def get_key(cls, key):
-        return cls.REDIS_CLIENT.get(key)
+    async def get_key(cls, key):
+        return await cls.REDIS_CLIENT.get(key)
