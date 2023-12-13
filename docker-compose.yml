@@ -11,7 +11,11 @@ services:
     env_file:
       - .env
     container_name: med_one_api
-    network_mode: host
+    # network_mode: host
+    networks:
+      back:
+        ipv4_address: 172.16.238.2
+      default:
 
   redis:
     build:
@@ -19,7 +23,10 @@ services:
     ports:
       - "6379:6379"
     container_name: med_one_api_redis
-    network_mode: host
+    # network_mode: host
+    networks:
+      back:
+        ipv4_address: 172.16.238.11
 
   dbpostgres:
     image: postgres:16-alpine
@@ -32,4 +39,20 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     container_name: med_one_api_dbpostgres
-    network_mode: host
+    # network_mode: host
+    networks:
+      back:
+        ipv4_address: 172.16.238.12
+
+networks:
+#Internal-only network for proper nginx proxying and ssh
+  back:
+    driver: bridge
+    internal: true
+    ipam:
+     driver: default
+     config:
+       - subnet: 172.16.238.0/24
+#External network actually
+  default:
+    driver: bridge
