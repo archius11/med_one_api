@@ -14,9 +14,10 @@
 
 - ```cp example.env .env```
 
-- Заполнить в .env незаполненные значения.
+- Fill blank fields in .env
 
 - ```docker-compose build```
 
 - ```docker-compose up -d```
 
+Working backend you can find at http://172.21.35.119:4567/docs
