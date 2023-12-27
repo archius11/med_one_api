@@ -20,4 +20,4 @@
 
 - ```docker-compose up -d```
 
-Working backend you can find at http://172.21.35.119:4567/docs
+Working backend you can find at http://172.16.238.2:4567/docs
